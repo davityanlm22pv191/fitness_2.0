@@ -4,6 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class CalendarViewModel: ViewModel() {
-    var name = MutableLiveData<String>()
-    var desc = MutableLiveData<String>()
+    var firstDate = MutableLiveData<String>()
+    var lastDate = MutableLiveData<String>()
 }

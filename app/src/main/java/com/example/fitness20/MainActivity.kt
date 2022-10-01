@@ -19,11 +19,11 @@ class MainActivity : AppCompatActivity() {
             CalendarBottomSheet().show(supportFragmentManager, "thisIsCalendar")
         }
 
-        calendarViewModel.name.observe(this){
+        calendarViewModel.firstDate.observe(this){
             bind.tvFirstDate.text = String.format("%s", it)
         }
 
-        calendarViewModel.desc.observe(this){
+        calendarViewModel.lastDate.observe(this){
             bind.tvLastDate.text = String.format("%s", it)
         }
 

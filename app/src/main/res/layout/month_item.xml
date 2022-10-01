@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/black"
+    android:layout_marginTop="33dp"
+    android:layout_marginBottom="3dp">
+
+    <TextView
+        android:id="@+id/tv_monthPlusYear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/January2022"
+        android:textColor="@color/white"
+        android:fontFamily="@font/vela_sans"
+        android:textSize="16sp"
+        android:singleLine="true"/>
+
+    <GridLayout
+        android:id="@+id/gl_datesOfMonth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:columnCount="7"
+        android:background="@null"/>
+
+</LinearLayout>
