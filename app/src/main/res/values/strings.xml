@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Fitness 2.0</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="today">Сегодня</string>
+    <string name="choose_date">Выбрать дату</string>
+    <string name="monday">ПН</string>
+    <string name="sunday">ВС</string>
+    <string name="saturday">СБ</string>
+    <string name="friday">ПТ</string>
+    <string name="thursday">ЧТ</string>
+    <string name="wednesday">СР</string>
+    <string name="tuesday">ВТ</string>
+    <string name="show">Показать</string>
 </resources>

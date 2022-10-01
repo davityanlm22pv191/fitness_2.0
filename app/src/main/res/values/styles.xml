@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="show_button_style">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:radius">22dp</item>
+    </style>
+
+</resources>
