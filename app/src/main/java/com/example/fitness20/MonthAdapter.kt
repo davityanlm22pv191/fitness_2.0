@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.setPadding
+import androidx.loader.content.Loader
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitness20.databinding.MonthItemBinding
 import java.time.LocalDate
@@ -35,8 +37,10 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
 
     class MonthHolder(item: View): RecyclerView.ViewHolder(item) {
         private val binding = MonthItemBinding.bind(item)
+        private var isSelected: Boolean = false
 
         fun bind(dateItem: DateItem, daysInMonthQty: Int, dayOfWeekNumber: Int) = with(binding){
+
             /* В этом учатке кода мы работаем с заголовком месяца */
             val chooseMonth = Month.values()[dateItem.date.month.value - 1].title
             tvMonthPlusYear.text = chooseMonth + " " + dateItem.date.year.toString()
@@ -45,37 +49,37 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
             for (i in 1 until dayOfWeekNumber){
                 var date = TextView(itemView.context)
                 date.text = ""
-                date = dateAction(dateItem, date)
+                date.setPadding(37)
                 glDatesOfMonth.addView(date)
             }
 
             for (i in 1..daysInMonthQty){
                 var date = TextView(itemView.context)
                 date.text = i.toString()
-                date = dateAction(dateItem, date)
+                date = setAction(dateItem, date, i)
                 glDatesOfMonth.addView(date)
             }
 
         }
 
-        private fun dateAction(dateItem: DateItem, date: TextView): TextView{
+        private fun setAction(dateItem: DateItem, date: TextView, iter: Int): TextView{
             date.setPadding(37)
-            date.textSize = 16F
             if(date.text == "") return date
 
+            date.textSize = 16F
 
-            /* Остановился здесь, нужно сделать так, чтобы сегодняшний день
-            * отображался пустым кружочком. Проблема: в dateItem не меняется дата
-            * Поиграться с инкрементом LocalDate в creteHolder */
-//            val today = LocalDate.now()
-//            if (dateItem.date == today) {
-//                date.setBackgroundResource(R.drawable.empty_ellipse)
-//            }
+            
+            val today = LocalDate.now()
+            val currentDay = LocalDate.of(dateItem.date.year, dateItem.date.month, iter)
+            if (currentDay == today) {
+                date.setBackgroundResource(R.drawable.empty_ellipse)
+            }
 
             date.setOnClickListener{
                 if(!dateItem.isSelected){
                     date.setBackgroundResource(R.drawable.fill_ellipse)
                     dateItem.isSelected = true
+                    Toast.makeText(itemView.context, "$currentDay", Toast.LENGTH_SHORT).show()
                 } else{
                     date.background = null
                     dateItem.isSelected = false

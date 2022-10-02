@@ -23,7 +23,7 @@ class CalendarBottomSheet : BottomSheetDialogFragment() {
         val activity = requireActivity()
         calendarViewModel = ViewModelProvider(activity).get(CalendarViewModel::class.java)
 
-        /* Работает с RecyclerView MonthAdapter */
+        /* Работаем с RecyclerView MonthAdapter */
         bind.rcCalendar.adapter = monthAdapter
         bind.rcCalendar.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
