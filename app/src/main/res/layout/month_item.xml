@@ -24,6 +24,11 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:columnCount="7"
-        android:background="@null"/>
+        android:background="@null"
+
+
+
+
+        />
 
 </LinearLayout>

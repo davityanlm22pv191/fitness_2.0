@@ -1,9 +1,11 @@
 package com.example.fitness20
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,13 +29,12 @@ class CalendarBottomSheet : BottomSheetDialogFragment() {
         bind.rcCalendar.adapter = monthAdapter
         bind.rcCalendar.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
-
         var today = LocalDate.now()
-        monthAdapter.add(DateItem(today.minusMonths(2)))
-        monthAdapter.add(DateItem(today.minusMonths(1)))
-        monthAdapter.add(DateItem(today))
-        bind.rcCalendar.smoothScrollToPosition(monthAdapter.itemCount - 1)
 
+        monthAdapter.addMonth(MonthItem(today.minusMonths(2)))
+        monthAdapter.addMonth(MonthItem(today.minusMonths(1)))
+        monthAdapter.addMonth(MonthItem(today))
+        bind.rcCalendar.smoothScrollToPosition(monthAdapter.itemCount - 1)
 
 
         bind.bClose.setOnClickListener{ dismiss()}
