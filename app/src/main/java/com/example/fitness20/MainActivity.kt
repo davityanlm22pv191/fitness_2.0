@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.example.fitness20.databinding.ActivityMainBinding
+import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,5 +29,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
 
 }

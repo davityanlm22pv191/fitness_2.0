@@ -143,8 +143,8 @@
             android:id="@+id/rc_calendar"
             android:layout_width="match_parent"
             android:layout_height="501dp"
-            android:layout_marginStart="28.76dp"
-            android:layout_marginEnd="30.24dp"
+            android:layout_marginStart="25.76dp"
+            android:layout_marginEnd="24.24dp"
             />
 
     <androidx.appcompat.widget.AppCompatButton

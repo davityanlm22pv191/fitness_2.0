@@ -7,17 +7,24 @@ import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.setMargins
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitness20.databinding.MonthItemBinding
 import java.time.LocalDate
 
-class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
+/* Как хранятся месяцы календаря
+* "Июнь 2022", "", "", "1", "2", "3", ...
+* Делаем вывод, что Июнь 2022 начался со среды*/
+class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
+
+    /* monthList - хранит все месяцы, которые следует отобразить (adapter.addMonth()) */
+    /* dateList - хранит все даты, которые следует отобразить (заполняется в BindViewHolder) */
     private val monthList = ArrayList<MonthItem>()
     private val dateList = ArrayList<Date>()
 
-    data class Date(val date: String, val isSelected: Boolean = false)
+    /* Класс, который хранит все даты виде TextView, а так же флаг выбран он или нет */
+    data class Date(val date: TextView, var isSelected: Boolean = false)
 
+    /* Так как месяцев всего 12, то использую перечисление для обращения */
     enum class Month(val title: String) {
         JANUARY("Январь"),
         FEBRUARY( "Февраль"),
@@ -41,54 +48,48 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
         }
     }
 
-    inner class MonthHolder(item: View): RecyclerView.ViewHolder(item) {
+    inner class MonthHolder(item: View, calendarListener: CalendarListener): RecyclerView.ViewHolder(item){
 
         private val binding = MonthItemBinding.bind(item)
 
-
-        fun bind(dateList: ArrayList<Date>, position: Int) = with(binding){
-
-            if(!isDigit(dateList[position].date)){
-
-                tvMonthPlusYear.text = dateList[position].date
+        fun bind(dateList: ArrayList<Date>, position: Int) = with(binding) {
+            /* Здесь заполняется заголовок месяца */
+            if (isMonth(dateList[position].date.text.toString())) {
+                tvMonthPlusYear.text = dateList[position].date.text
                 tvMonthPlusYear.textSize = 16F
-            }
-            else{
-
-                var tvDate = TextView(itemView.context)
-
-
-                if (dateList[position].date.toInt() == 0){
-                    tvDate.text = ""
-
-                } else{
-                    val textColor = ContextCompat.getColor(itemView.context, R.color.white)
-                    tvDate.setTextColor(textColor)
-                    tvDate.text = dateList[position].date
+            } else { /* Здесь заполняются непосредственно даты месяца */
+//                setAction(dateList, position)
+                dateList[position].date.setOnClickListener {
+                    calendarListener.onClick(calcDate(dateList, position), LocalDate.now().minusDays(5))
                 }
-                glDatesOfMonth.addView(tvDate)
+                glDatesOfMonth.addView(dateList[position].date)
+                val textColor = ContextCompat.getColor(itemView.context, R.color.white)
+                dateList[position].date.setTextColor(textColor)
+                dateList[position].date.gravity = Gravity.CENTER
+                dateList[position].date.textSize = 16F
+                val mParams = dateList[position].date.layoutParams as GridLayout.LayoutParams
+                mParams.apply {
+                    width = 132
+                    height = 160
 
-
-                tvDate.gravity = Gravity.CENTER
-                tvDate.textSize = 16F
-                val mParams = tvDate.layoutParams as GridLayout.LayoutParams
-//                mParams.apply {
-//                    width = 200
-//                    height = 220
-//
-//                }
-                mParams.topMargin = 20
-                tvDate.layoutParams = mParams
+                }
+                dateList[position].date.layoutParams = mParams
             }
         }
 
-        private fun isDigit(string: String): Boolean{
-            if ((string[0] >= '0') and (string[0] <= '9')){
-                return true
+        /* Возвращает true - string хранит в себе месяц
+        *  Используется для определения является ли строка месяцем
+        *  Это заголовок месяца или даты*/
+        private fun isMonth(string: String): Boolean{
+            if ((string[0] >= '0') and (string[0] <= '9') or (string[0] == ' ')){
+                return false
             }
-            return false
+            return true
         }
 
+        /* Возвращает первое слово строки
+        * Используется для взятия названия месяца из строки "Октябрь 2022"
+        * Функция вернет "Октябрь" */
         private fun getFirstWord(string: String): String{
             var i = 0
             var word = String()
@@ -99,6 +100,9 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
             return word
         }
 
+        /* Возвращает последее слово строки
+        * Используется для взятия года из строки "Октябрь 2022"
+        * Функция вернет "2022" */
         private fun getLastWord(string: String): String{
             var i = string.length - 1
             var word = String()
@@ -109,23 +113,25 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
             return word.reversed()
         }
 
+        /* Функция считает дату по позиции элемента в dateList */
         private fun calcDate(dateList: ArrayList<Date>, position: Int): LocalDate{
             for (i in position downTo 0){
-                if(!isDigit(dateList[i].date)){
-                    val month = getFirstWord(dateList[i].date)
-                    val monthOrdinal = Month.JANUARY.getNumberByTitle(month)
-                    val year = getLastWord(dateList[i].date).toInt()
-                    return LocalDate.of(year, monthOrdinal, dateList[position].date.toInt())
+                if(isMonth(dateList[i].date.text.toString())){
+                    val month = getFirstWord(dateList[i].date.text.toString())
+                    val monthOrdinal = Month.JANUARY.getNumberByTitle(month) + 1
+                    val year = getLastWord(dateList[i].date.text.toString()).toInt()
+                    return LocalDate.of(year, monthOrdinal, dateList[position].date.text.toString().toInt())
                 }
             }
             return LocalDate.now()
         }
 
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MonthHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.month_item, parent, false)
-        return MonthHolder(view)
+        return MonthHolder(view, calendarListener)
     }
 
     override fun onBindViewHolder(holder: MonthHolder, position: Int) {
@@ -140,15 +146,20 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
         val dayOfWeekNumber = monthFirstDay.dayOfWeek.value
         var listPosition = dateList.size
 
+        /* Заголовок календаря */
         var monthPlusYear = Month.values()[monthList[position].date.monthValue - 1].title
         monthPlusYear += " "
         monthPlusYear += monthList[position].date.year.toString()
-        dateList.add(Date(monthPlusYear))
+        val tvMonthPlusYear = TextView(holder.itemView.context)
+        tvMonthPlusYear.text = monthPlusYear
+        dateList.add(Date(tvMonthPlusYear))
         holder.bind(dateList, listPosition)
 
         /* Пустые даты календаря */
         for (i in 1 until dayOfWeekNumber){
-            val date = Date("0")
+            val tvEmpty = TextView(holder.itemView.context)
+            tvEmpty.text = " "
+            val date = Date(tvEmpty)
             dateList.add(date)
             listPosition++
             holder.bind(dateList, listPosition)
@@ -156,7 +167,9 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
 
         /* Числовые значения календаря */
         for (i in 1..daysInMonthQty){
-            val date = Date(i.toString())
+            val tvDate = TextView(holder.itemView.context)
+            tvDate.text = i.toString()
+            val date = Date(tvDate)
             dateList.add(date)
             listPosition++
             holder.bind(dateList, listPosition)
@@ -170,6 +183,10 @@ class MonthAdapter: RecyclerView.Adapter<MonthAdapter.MonthHolder>() {
 
     fun addMonth(monthItem: MonthItem){
         monthList.add(monthItem)
+    }
+
+    interface CalendarListener{
+        fun onClick(firstDate: LocalDate, secondDate: LocalDate)
     }
 
 }
