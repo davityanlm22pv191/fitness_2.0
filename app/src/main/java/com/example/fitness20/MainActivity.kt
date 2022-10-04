@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.example.fitness20.databinding.ActivityMainBinding
-import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             bind.tvFirstDate.text = String.format("%s", it)
         }
 
-        calendarViewModel.lastDate.observe(this){
+        calendarViewModel.secondDate.observe(this){
             bind.tvLastDate.text = String.format("%s", it)
         }
 

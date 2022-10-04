@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="5dp">
+        android:layout_margin="5dp"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -23,15 +24,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Первая дата календаря"
+                android:text="@string/firstDate"
+                android:textColor="@color/white"
                 android:gravity="center"
+                android:textSize="16sp"
                 android:textStyle="bold"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Вторая дата календаря"
+                android:text="@string/secondDate"
+                android:textColor="@color/white"
                 android:gravity="center"
+                android:textSize="16sp"
                 android:textStyle="bold"/>
 
         </LinearLayout>
@@ -46,14 +51,18 @@
                 android:id="@+id/tv_firstDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Жду выбора даты"
+                android:text="@string/waiting"
+                android:textColor="@color/white"
+                android:textSize="16sp"
                 android:gravity="center"/>
 
             <TextView
                 android:id="@+id/tv_lastDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Жду выбора даты"
+                android:text="@string/waiting"
+                android:textColor="@color/white"
+                android:textSize="16sp"
                 android:gravity="center"/>
 
 
@@ -64,13 +73,13 @@
         android:id="@+id/bt_openCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
-        android:text="calendar"
+        android:text="@string/openCalendar"
         app:icon="@drawable/ic_calendar" />
 
 </RelativeLayout>

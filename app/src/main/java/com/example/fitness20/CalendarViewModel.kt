@@ -5,5 +5,5 @@ import androidx.lifecycle.ViewModel
 
 class CalendarViewModel: ViewModel() {
     var firstDate = MutableLiveData<String>()
-    var lastDate = MutableLiveData<String>()
+    var secondDate = MutableLiveData<String>()
 }

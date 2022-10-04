@@ -21,8 +21,13 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
     private val monthList = ArrayList<MonthItem>()
     private val dateList = ArrayList<Date>()
 
+    private val maxCalendarElement = 99999
+    private var firstSelected = maxCalendarElement
+    private var isRangeSelected = false
+
     /* Класс, который хранит все даты виде TextView, а так же флаг выбран он или нет */
-    data class Date(val date: TextView, var isSelected: Boolean = false)
+    data class Date(val date: TextView,
+                    var isSelected: Boolean = false)
 
     /* Так как месяцев всего 12, то использую перечисление для обращения */
     enum class Month(val title: String) {
@@ -48,7 +53,7 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
         }
     }
 
-    inner class MonthHolder(item: View, calendarListener: CalendarListener): RecyclerView.ViewHolder(item){
+    inner class MonthHolder(item: View): RecyclerView.ViewHolder(item){
 
         private val binding = MonthItemBinding.bind(item)
 
@@ -58,9 +63,10 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
                 tvMonthPlusYear.text = dateList[position].date.text
                 tvMonthPlusYear.textSize = 16F
             } else { /* Здесь заполняются непосредственно даты месяца */
-//                setAction(dateList, position)
-                dateList[position].date.setOnClickListener {
-                    calendarListener.onClick(calcDate(dateList, position), LocalDate.now().minusDays(5))
+                setAction(position)
+                if (dateList[position].isSelected){
+                    dateList[position].date.setBackgroundResource(R.drawable.empty_ellipse)
+                    firstSelected = position
                 }
                 glDatesOfMonth.addView(dateList[position].date)
                 val textColor = ContextCompat.getColor(itemView.context, R.color.white)
@@ -70,7 +76,7 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
                 val mParams = dateList[position].date.layoutParams as GridLayout.LayoutParams
                 mParams.apply {
                     width = 132
-                    height = 160
+                    height = 180
 
                 }
                 dateList[position].date.layoutParams = mParams
@@ -114,7 +120,8 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
         }
 
         /* Функция считает дату по позиции элемента в dateList */
-        private fun calcDate(dateList: ArrayList<Date>, position: Int): LocalDate{
+        private fun calcDate(dateList: ArrayList<Date>, position: Int?): LocalDate{
+            if (position == null) return LocalDate.now()
             for (i in position downTo 0){
                 if(isMonth(dateList[i].date.text.toString())){
                     val month = getFirstWord(dateList[i].date.text.toString())
@@ -126,12 +133,91 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
             return LocalDate.now()
         }
 
+        private fun setAction(position: Int){
+            dateList[position].date.setOnClickListener {
+
+                /* Случай, если нажали на пустую ячейку */
+                if (dateList[position].date.text == " ") return@setOnClickListener
+
+                if (position == firstSelected){
+                    clearSelected()
+                    dateList[position].date.setBackgroundResource(R.drawable.fill_ellipse)
+                    calendarListener.onClick(calcDate(dateList, position), calcDate(dateList, firstSelected))
+                    isRangeSelected = false
+                    firstSelected = position
+                    return@setOnClickListener
+                }
+
+                if (isRangeSelected){
+                    clearSelected()
+                    dateList[position].date.setBackgroundResource(R.drawable.fill_ellipse)
+                    isRangeSelected = false
+                    calendarListener.onClick(calcDate(dateList, position), calcDate(dateList, position))
+                    firstSelected = position
+                    return@setOnClickListener
+                }
+
+                if (position > firstSelected){
+                    for (i in 1 until dateList.size){
+                        if (dateList[i].date.text == " ") { continue }
+                        else if (i < firstSelected || i > position){
+                            dateList[i].date.background = null
+                            continue
+                        }
+                        else if(i == firstSelected){
+                            dateList[i].date.setBackgroundResource(R.drawable.left_side_ellipse)
+                            continue
+                        }
+                        else if(i == position){
+                            dateList[i].date.setBackgroundResource(R.drawable.right_side_ellipse)
+                            continue
+                        }
+                        else if(i in firstSelected + 1 until position){
+                            dateList[i].date.setBackgroundResource(R.drawable.intermediate)
+                            continue
+                        }
+                    }
+                }
+                else if (position < firstSelected){
+                    for (i in 1 until dateList.size){
+                        if (dateList[i].date.text == " ") { continue }
+                        else if(i < position || i > firstSelected){
+                            dateList[i].date.background = null
+                            continue
+                        }
+                        else if (i == position){
+                            dateList[i].date.setBackgroundResource(R.drawable.left_side_ellipse)
+                            continue
+                        }
+                        else if (i == firstSelected){
+                            dateList[i].date.setBackgroundResource(R.drawable.right_side_ellipse)
+                            continue
+                        }
+                        else if (i in position + 1 until firstSelected){
+                            dateList[i].date.setBackgroundResource(R.drawable.intermediate)
+                            continue
+                        }
+                    }
+                }
+                isRangeSelected = true
+
+                calendarListener.onClick(calcDate(dateList, position), calcDate(dateList, firstSelected))
+                firstSelected = position
+
+            }
+        }
+
+        private fun clearSelected(){
+            for (i in 1 until dateList.size){
+                dateList[i].date.background = null
+            }
+        }
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MonthHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.month_item, parent, false)
-        return MonthHolder(view, calendarListener)
+        return MonthHolder(view)
     }
 
     override fun onBindViewHolder(holder: MonthHolder, position: Int) {
@@ -167,9 +253,15 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
 
         /* Числовые значения календаря */
         for (i in 1..daysInMonthQty){
+
             val tvDate = TextView(holder.itemView.context)
             tvDate.text = i.toString()
             val date = Date(tvDate)
+            val currentDay = LocalDate.of(monthList[position].date.year,
+                monthList[position].date.monthValue, i)
+            if (LocalDate.now() == currentDay){
+                date.isSelected = true
+            }
             dateList.add(date)
             listPosition++
             holder.bind(dateList, listPosition)

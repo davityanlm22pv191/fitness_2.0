@@ -22,8 +22,10 @@ class CalendarBottomSheet() :
     private lateinit var bind: FragmentCalendarBottomSheetBinding
     private lateinit var calendarViewModel: CalendarViewModel
     private val monthAdapter = MonthAdapter(this)
+    private var fst = LocalDate.now()
+    private var snd = LocalDate.now()
 
-    enum class GenitiveMonth(val title: String){
+    enum class GenitiveMonth(private val title: String){
         JANUARY("января"),
         FEBRUARY( "февраля"),
         MARCH( "марта"),
@@ -40,7 +42,6 @@ class CalendarBottomSheet() :
         fun getTitleByOrdinal(ordinal: Int): String{
             return values()[ordinal].title
         }
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,6 +62,7 @@ class CalendarBottomSheet() :
 
         bind.bClose.setOnClickListener{ dismiss()}
         bind.bShow.setOnClickListener{ saveAction() }
+        bind.tvToday.setOnClickListener { onClick(LocalDate.now(), LocalDate.now()) }
 
 
     }
@@ -73,29 +75,41 @@ class CalendarBottomSheet() :
 
     private fun saveAction(){
 
-//        calendarViewModel.name.value = bind.name.text.toString()
-//        calendarViewModel.desc.value = bind.desc.text.toString()
-//        bind.name.setText("")
-//        bind.desc.setText("")
+        calendarViewModel.firstDate.value = this.fst.toString()
+        calendarViewModel.secondDate.value = this.snd.toString()
 
         dismiss()
     }
 
     override fun onClick(firstDate: LocalDate, secondDate: LocalDate) {
-        val firstMonthNumber = firstDate.monthValue
-        val secondMonthNumber = secondDate.monthValue
-        val firstDayPlusMonth = "${firstDate.dayOfMonth} ${GenitiveMonth.JANUARY.getTitleByOrdinal(firstMonthNumber)}"
-        val secondDayPlusMonth = "${secondDate.dayOfMonth} ${GenitiveMonth.JANUARY.getTitleByOrdinal(secondMonthNumber)}"
+
+        val firstMonthOrdinal = firstDate.monthValue - 1
+        val firstDayPlusMonth = "${firstDate.dayOfMonth} ${GenitiveMonth.JANUARY.getTitleByOrdinal(firstMonthOrdinal)}"
         var bShowTitle = resources.getString(R.string.show)
+
+        /* Если пользователь 2 раза нажал на одну и ту же дату */
+        if (firstDate == secondDate){
+            bShowTitle += " $firstDayPlusMonth"
+            bind.bShow.text = bShowTitle
+            return
+        }
+
+        /* Случаи, если даты разные */
+        val secondMonthOrdinal = secondDate.monthValue - 1
+        val secondDayPlusMonth = "${secondDate.dayOfMonth} ${GenitiveMonth.JANUARY.getTitleByOrdinal(secondMonthOrdinal)}"
+
+        /* Случай, если пользователь выбрал сначала бОльшую дату */
+        if (firstDate > secondDate){
+            bShowTitle += " $secondDayPlusMonth - $firstDayPlusMonth"
+            bind.bShow.text = bShowTitle
+            return
+        }
+        /* Случай, если выбрал сначала меньшую дату */
         bShowTitle += " $firstDayPlusMonth - $secondDayPlusMonth"
         bind.bShow.text = bShowTitle
 
-//        calendarViewModel.firstDate = MutableLiveData(firstDate.toString())
-//        calendarViewModel.lastDate = MutableLiveData(lastDate.toString())
+        calendarViewModel.firstDate = MutableLiveData(firstDate.toString())
+        calendarViewModel.secondDate = MutableLiveData(secondDate.toString())
 
     }
-
-
-
-
 }
