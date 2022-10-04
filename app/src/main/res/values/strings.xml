@@ -13,4 +13,8 @@
     <string name="tuesday">ВТ</string>
     <string name="show">Показать</string>
     <string name="January2022">Январь 2022</string>
+    <string name="firstDate">Первая дата</string>
+    <string name="secondDate">Вторая дата</string>
+    <string name="waiting">Жду выбора даты</string>
+    <string name="openCalendar">calendar</string>
 </resources>
