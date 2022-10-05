@@ -27,7 +27,8 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
 
     /* Класс, который хранит все даты виде TextView, а так же флаг выбран он или нет */
     data class Date(val date: TextView,
-                    var isSelected: Boolean = false)
+                    var isFuture: Boolean = false,
+                    var isToday: Boolean = false)
 
     /* Так как месяцев всего 12, то использую перечисление для обращения */
     enum class Month(val title: String) {
@@ -64,13 +65,17 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
                 tvMonthPlusYear.textSize = 16F
             } else { /* Здесь заполняются непосредственно даты месяца */
                 setAction(position)
-                if (dateList[position].isSelected){
+                if (dateList[position].isToday){
                     dateList[position].date.setBackgroundResource(R.drawable.empty_ellipse)
                     firstSelected = position
                 }
                 glDatesOfMonth.addView(dateList[position].date)
-                val textColor = ContextCompat.getColor(itemView.context, R.color.white)
-                dateList[position].date.setTextColor(textColor)
+
+                if (dateList[position].isFuture){
+                    dateList[position].date.setTextColor(ContextCompat.getColor(itemView.context, R.color.light_black))
+                } else{
+                    dateList[position].date.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                }
                 dateList[position].date.gravity = Gravity.CENTER
                 dateList[position].date.textSize = 16F
                 val mParams = dateList[position].date.layoutParams as GridLayout.LayoutParams
@@ -206,13 +211,6 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
 
             }
         }
-
-        private fun clearSelected(){
-            for (i in 1 until dateList.size){
-                dateList[i].date.background = null
-            }
-        }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MonthHolder {
@@ -260,7 +258,10 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
             val currentDay = LocalDate.of(monthList[position].date.year,
                 monthList[position].date.monthValue, i)
             if (LocalDate.now() == currentDay){
-                date.isSelected = true
+                date.isToday = true
+            }
+            if (LocalDate.now() < currentDay){
+                date.isFuture = true
             }
             dateList.add(date)
             listPosition++
@@ -275,6 +276,12 @@ class MonthAdapter(private val calendarListener: CalendarListener): RecyclerView
 
     fun addMonth(monthItem: MonthItem){
         monthList.add(monthItem)
+    }
+
+    fun clearSelected(){
+        for (i in 1 until dateList.size){
+            dateList[i].date.background = null
+        }
     }
 
     interface CalendarListener{
