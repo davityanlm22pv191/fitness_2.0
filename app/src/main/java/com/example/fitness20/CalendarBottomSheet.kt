@@ -13,8 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.time.LocalDate
 
 
-class CalendarBottomSheet:
-                    BottomSheetDialogFragment(), MonthAdapter.CalendarListener {
+class CalendarBottomSheet: BottomSheetDialogFragment(), MonthAdapter.CalendarListener {
 
     private lateinit var bind: FragmentCalendarBottomSheetBinding
     private lateinit var calendarViewModel: CalendarViewModel
